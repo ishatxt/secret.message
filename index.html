@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Message For You 🎀</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #fff0f5;
+      --paper:  #fffbfc;
+      --acc:    #ffb7c5;
+      --mid:    #ff8fa3;
+      --deep:   #e8547a;
+      --pixel:  #c94368;
+      --text:   #5a4a4d;
+      --line:   rgba(255,183,197,0.35);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse at 15% 15%, rgba(255,214,224,.7) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 85%, rgba(255,183,197,.6) 0%, transparent 55%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* pixel grid */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,183,197,.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,183,197,.18) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─────────── LOCK ─────────── */
+    #lock-screen {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 300;
+      gap: 20px;
+      transition: opacity .6s ease;
+    }
+
+    .lock-title {
+      font-size: clamp(.5rem,2vw,.75rem);
+      color: var(--deep);
+      text-shadow: 3px 3px 0 rgba(232,84,122,.2);
+      text-align: center;
+      letter-spacing: 2px;
+    }
+
+    #pass {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .62rem;
+      padding: 14px 24px;
+      border: 3px solid var(--mid);
+      border-right-color: var(--deep);
+      border-bottom-color: var(--deep);
+      background: var(--paper);
+      color: var(--text);
+      outline: none;
+      text-align: center;
+      box-shadow: 4px 4px 0 var(--deep);
+      transition: box-shadow .15s;
+    }
+    #pass:focus { box-shadow: 5px 5px 0 var(--pixel); }
+    #pass::placeholder { color: var(--acc); opacity: 1; }
+
+    .lock-hint { font-size: .38rem; color: var(--acc); }
+
+    /* ─────────── BOOK WRAPPER ─────────── */
+    #book-wrapper { display: none; position: relative; z-index: 10; }
+
+    /* spine */
+    .spine {
+      position: absolute;
+      left: -22px; top: 0;
+      width: 22px; height: 100%;
+      background: var(--deep);
+      box-shadow: -3px 0 0 var(--pixel);
+      border-radius: 4px 0 0 4px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: space-around;
+      padding: 14px 0;
+    }
+    .ring {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      border: 3px solid #fff0f5;
+      background: var(--pixel);
+    }
+
+    /* ─────────── BOOK ─────────── */
+    #book-container {
+      width: min(430px, 90vw);
+      height: min(540px, 82vh);
+      perspective: 1400px;
+      position: relative;
+    }
+
+    .book {
+      width: 100%; height: 100%;
+      position: relative;
+      box-shadow: 8px 8px 0 var(--pixel), 13px 13px 0 rgba(201,67,104,.3);
+    }
+
+    /* ─────────── PAGES ─────────── */
+    .page {
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 28px 30px 58px;
+      background: var(--paper);
+      overflow: hidden;
+    }
+    .page.lined {
+      background-image: repeating-linear-gradient(
+        transparent 0, transparent 27px,
+        var(--line) 27px, var(--line) 28px
+      );
+    }
+    .page.active { display: flex; }
+
+    /* flip animations */
+    .page.fo-fwd { animation: foFwd .38s ease-in  forwards; }
+    .page.fi-fwd { animation: fiFwd .38s ease-out forwards; }
+    .page.fo-bwd { animation: foBwd .38s ease-in  forwards; }
+    .page.fi-bwd { animation: fiBwd .38s ease-out forwards; }
+
+    @keyframes foFwd { from{transform:rotateY(0)}    to{transform:rotateY(-90deg); opacity:0} }
+    @keyframes fiFwd { from{transform:rotateY(90deg); opacity:0}  to{transform:rotateY(0)} }
+    @keyframes foBwd { from{transform:rotateY(0)}    to{transform:rotateY(90deg);  opacity:0} }
+    @keyframes fiBwd { from{transform:rotateY(-90deg);opacity:0} to{transform:rotateY(0)} }
+
+    /* cover pages */
+    .page.cover {
+      background: linear-gradient(145deg,#ffb7c5,#ff6b8a,#e8547a) !important;
+      background-image: none !important;
+    }
+
+    /* ─────────── TYPOGRAPHY ─────────── */
+    .pg-title {
+      font-size: clamp(.42rem,1.7vw,.63rem);
+      color: var(--deep);
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      text-shadow: 2px 2px 0 rgba(232,84,122,.18);
+    }
+    .cover .pg-title { color:#fff; text-shadow:2px 2px 0 var(--pixel); }
+
+    .pg-text {
+      font-family: 'Caveat', cursive;
+      font-size: clamp(1rem,3.5vw,1.18rem);
+      color: var(--text);
+      line-height: 1.9;
+    }
+    .cover .pg-text { color: rgba(255,255,255,.95); }
+
+    .pg-list { display:flex; flex-direction:column; gap:7px; text-align:left; width:100%; }
+    .pg-item {
+      font-family:'Caveat',cursive;
+      font-size:clamp(.9rem,3vw,1.08rem);
+      color:var(--text);
+      display:flex; align-items:center; gap:8px;
+    }
+    .pg-item::before { content:'✦'; color:var(--mid); font-size:.72rem; flex-shrink:0; }
+
+    .pg-divider {
+      width:80%; height:2px;
+      background:linear-gradient(90deg,transparent,var(--acc),transparent);
+      margin:9px 0; flex-shrink:0;
+    }
+    .pg-num { position:absolute; bottom:20px; right:14px; font-size:.33rem; color:var(--acc); }
+
+    /* ─────────── BUTTONS ─────────── */
+    .nav {
+      position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+      display:flex; gap:12px; align-items:center;
+    }
+    .btn {
+      font-family:'Press Start 2P',monospace;
+      font-size:.42rem;
+      background:var(--mid); color:#fff;
+      border:2px solid var(--deep);
+      border-right-color:var(--pixel);
+      border-bottom-color:var(--pixel);
+      padding:8px 14px;
+      cursor:pointer;
+      box-shadow:3px 3px 0 var(--pixel);
+      user-select:none;
+      transition:transform .07s,box-shadow .07s;
+    }
+    .btn:active { transform:translate(3px,3px); box-shadow:0 0 0 var(--pixel); }
+    .cover .btn { background:rgba(255,255,255,.22); border-color:#fff; }
+
+    /* ─────────── DECO ─────────── */
+    .deco { position:absolute; pointer-events:none; font-size:.95rem; }
+    .corner { position:absolute; font-size:.88rem; line-height:1; }
+    .accent-border {
+      position:absolute; top:6px; left:6px; right:6px; bottom:6px;
+      border:2px dashed rgba(255,183,197,.38); pointer-events:none;
+    }
+    .tape {
+      position:absolute; top:-7px; left:50%; transform:translateX(-50%) rotate(-2deg);
+      width:58px; height:19px;
+      background:rgba(255,183,197,.45);
+      border-left:2px solid rgba(255,183,197,.25);
+      border-right:2px solid rgba(255,183,197,.25);
+    }
+
+    /* floating hearts */
+    @keyframes floatH { 0%{transform:translateY(0) scale(1);opacity:1} 100%{transform:translateY(-42px) scale(.2);opacity:0} }
+    .fheart { position:absolute; pointer-events:none; animation:floatH 2.2s ease-out infinite; }
+
+    /* ─────────── CAT ANIMATIONS ─────────── */
+    @keyframes lockFloat { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-12px) rotate(2deg)} }
+    @keyframes catBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes eyeBlink  { 0%,87%,100%{transform:scaleY(1)} 91%{transform:scaleY(.07)} }
+    @keyframes tailWag   { 0%,100%{transform:rotate(-14deg)} 50%{transform:rotate(14deg)} }
+    @keyframes pawWave   { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(-28deg)} }
+
+    .a-float  { animation: lockFloat 2s ease-in-out infinite; }
+    .a-bounce { animation: catBounce 1.3s ease-in-out infinite; }
+    .a-blink  { animation: eyeBlink 3.6s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+    .a-tail   { animation: tailWag  .9s ease-in-out infinite;  transform-box:fill-box; transform-origin:left center; }
+    .a-paw    { animation: pawWave 1.6s ease-in-out infinite;  transform-box:fill-box; transform-origin:bottom center; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ LOCK SCREEN ═══════════════ -->
+<div id="lock-screen">
+  <!-- Pixel cat, bouncing -->
+  <svg class="a-float" xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 22 24" width="116" height="116" style="image-rendering:pixelated">
+    <!-- ears -->
+    <rect x="2"  y="0" width="3" height="4" fill="#ffb7c5"/>
+    <rect x="17" y="0" width="3" height="4" fill="#ffb7c5"/>
+    <rect x="3"  y="0" width="1" height="3" fill="#ff8fa3"/>
+    <rect x="17" y="0" width="1" height="3" fill="#ff8fa3"/>
+    <!-- head -->
+    <rect x="2" y="3" width="18" height="11" fill="#ffb7c5"/>
+    <!-- eyes -->
+    <rect class="a-blink" x="5"  y="6" width="4" height="3" fill="#5a4a4d"/>
+    <rect x="6"  y="6" width="1" height="1" fill="white"/>
+    <rect class="a-blink" x="13" y="6" width="4" height="3" fill="#5a4a4d"/>
+    <rect x="14" y="6" width="1" height="1" fill="white"/>
+    <!-- blush -->
+    <rect x="3"  y="9" width="3" height="1" fill="rgba(255,107,138,.38)"/>
+    <rect x="16" y="9" width="3" height="1" fill="rgba(255,107,138,.38)"/>
+    <!-- nose -->
+    <rect x="10" y="9" width="2" height="1" fill="#ff6b8a"/>
+    <!-- mouth -->
+    <rect x="9"  y="10" width="1" height="1" fill="#ff6b8a"/>
+    <rect x="12" y="10" width="1" height="1" fill="#ff6b8a"/>
+    <!-- whiskers -->
+    <rect x="2"  y="9" width="3" height="1" fill="rgba(90,74,77,.22)"/>
+    <rect x="17" y="9" width="3" height="1" fill="rgba(90,74,77,.22)"/>
+    <!-- body -->
+    <rect x="3" y="14" width="16" height="8" fill="#ffb7c5"/>
+    <!-- bow -->
+    <rect x="7"  y="16" width="3" height="3" fill="#ff6b8a"/>
+    <rect x="12" y="16" width="3" height="3" fill="#ff6b8a"/>
+    <rect x="10" y="16" width="2" height="3" fill="#ff8fa3"/>
+    <rect x="10" y="17" width="2" height="1" fill="white"/>
+    <!-- paws -->
+    <rect x="4"  y="22" width="4" height="2" fill="#ffb7c5"/>
+    <rect x="14" y="22" width="4" height="2" fill="#ffb7c5"/>
+    <!-- tail -->
+    <rect class="a-tail" x="19" y="18" width="3" height="2" fill="#ffb7c5"/>
+    <rect class="a-tail" x="21" y="16" width="2" height="2" fill="#ffb7c5"/>
+  </svg>
+
+  <h1 class="lock-title">✦ Enter Password ✦</h1>
+  <input type="password" id="pass" placeholder="♡ type here ♡"
+         oninput="checkPass()" autocomplete="off">
+  <p class="lock-hint">✦ she knows the secret word 🐱 ✦</p>
+</div>
+
+<!-- ═══════════════ BOOK ═══════════════ -->
+<div id="book-wrapper">
+  <div style="position:relative">
+    <!-- Spiral spine -->
+    <div class="spine">
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <div class="ring"></div><div class="ring"></div>
+    </div>
+
+    <div id="book-container">
+      <div class="book">
+
+        <!-- ▓▓▓ PAGE 1 – COVER ▓▓▓ -->
+        <div class="page cover active" id="p0">
+          <div class="deco" style="top:12px;left:14px">🌸</div>
+          <div class="deco" style="top:12px;right:14px">🌸</div>
+          <div class="deco" style="bottom:52px;left:14px">💕</div>
+          <div class="deco" style="bottom:52px;right:14px">💕</div>
+          <div class="fheart" style="left:22%;animation-delay:0s">💗</div>
+          <div class="fheart" style="left:58%;animation-delay:.9s">💕</div>
+          <div class="fheart" style="left:78%;animation-delay:1.8s">🌸</div>
+
+          <!-- Cover pixel cat with heart eyes -->
+          <svg class="a-bounce" xmlns="http://www.w3.org/2000/svg"
+               viewBox="0 0 24 26" width="120" height="120"
+               style="image-rendering:pixelated;margin-bottom:12px">
+            <rect x="2"  y="0" width="4" height="5" fill="rgba(255,255,255,.88)"/>
+            <rect x="18" y="0" width="4" height="5" fill="rgba(255,255,255,.88)"/>
+            <rect x="3"  y="0" width="2" height="4" fill="rgba(255,200,210,.6)"/>
+            <rect x="18" y="0" width="2" height="4" fill="rgba(255,200,210,.6)"/>
+            <rect x="2"  y="4" width="20" height="11" fill="rgba(255,255,255,.9)"/>
+            <!-- heart eyes -->
+            <rect x="5"  y="7" width="2" height="1" fill="#ff6b8a"/>
+            <rect x="8"  y="7" width="2" height="1" fill="#ff6b8a"/>
+            <rect x="4"  y="8" width="6" height="2" fill="#ff6b8a"/>
+            <rect x="5"  y="10" width="4" height="1" fill="#ff6b8a"/>
+            <rect x="6"  y="11" width="2" height="1" fill="#ff6b8a"/>
+            <rect x="14" y="7" width="2" height="1" fill="#ff6b8a"/>
+            <rect x="17" y="7" width="2" height="1" fill="#ff6b8a"/>
+            <rect x="13" y="8" width="6" height="2" fill="#ff6b8a"/>
+            <rect x="14" y="10" width="4" height="1" fill="#ff6b8a"/>
+            <rect x="15" y="11" width="2" height="1" fill="#ff6b8a"/>
+            <!-- nose -->
+            <rect x="11" y="11" width="2" height="1" fill="rgba(255,183,197,.8)"/>
+            <!-- mouth -->
+            <rect x="10" y="12" width="4" height="1" fill="rgba(255,183,197,.8)"/>
+            <!-- blush -->
+            <rect x="4"  y="12" width="3" height="1" fill="rgba(255,107,138,.35)"/>
+            <rect x="17" y="12" width="3" height="1" fill="rgba(255,107,138,.35)"/>
+            <!-- body -->
+            <rect x="4" y="15" width="16" height="9" fill="rgba(255,255,255,.9)"/>
+            <!-- big bow -->
+            <rect x="8"  y="16" width="4" height="4" fill="#ff6b8a"/>
+            <rect x="12" y="16" width="4" height="4" fill="#ff6b8a"/>
+            <rect x="11" y="17" width="2" height="2" fill="#ff8fa3"/>
+            <rect x="11" y="18" width="2" height="1" fill="white"/>
+            <!-- paws -->
+            <rect x="5"  y="24" width="4" height="2" fill="rgba(255,255,255,.88)"/>
+            <rect x="15" y="24" width="4" height="2" fill="rgba(255,255,255,.88)"/>
+            <!-- tail -->
+            <rect class="a-tail" x="20" y="20" width="4" height="2" fill="rgba(255,255,255,.8)"/>
+            <rect class="a-tail" x="23" y="18" width="2" height="2" fill="rgba(255,255,255,.8)"/>
+          </svg>
+
+          <p class="pg-title">✦ A Message For You ✦</p>
+          <p class="pg-text" style="margin-top:8px">
+            made with love,<br>just for you 💕
+          </p>
+          <div class="nav">
+            <button class="btn" onclick="goToPage(1)">Open The Journal →</button>
+          </div>
+        </div>
+
+        <!-- ▓▓▓ PAGE 2 ▓▓▓ -->
+        <div class="page lined" id="p1">
+          <div class="corner" style="top:10px;left:12px">🌸</div>
+          <div class="corner" style="top:10px;right:12px">✨</div>
+          <div class="tape"></div>
+          <p class="pg-title">The Day I Met You</p>
+
+          <!-- sitting cat -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 18" width="68" height="68"
+               style="image-rendering:pixelated;margin:4px 0 10px">
+            <rect x="2"  y="0" width="2" height="3" fill="#ffb7c5"/>
+            <rect x="12" y="0" width="2" height="3" fill="#ffb7c5"/>
+            <rect x="2"  y="2" width="12" height="8" fill="#ffb7c5"/>
+            <rect class="a-blink" x="4" y="4" width="3" height="3" fill="#5a4a4d"/>
+            <rect x="5"  y="4" width="1" height="1" fill="white"/>
+            <rect class="a-blink" x="9" y="4" width="3" height="3" fill="#5a4a4d"/>
+            <rect x="10" y="4" width="1" height="1" fill="white"/>
+            <rect x="3"  y="7" width="2" height="1" fill="rgba(255,107,138,.35)"/>
+            <rect x="11" y="7" width="2" height="1" fill="rgba(255,107,138,.35)"/>
+            <rect x="7"  y="6" width="2" height="1" fill="#ff6b8a"/>
+            <rect x="6"  y="7" width="1" height="1" fill="#ff6b8a"/>
+            <rect x="9"  y="7" width="1" height="1" fill="#ff6b8a"/>
+            <rect x="3" y="10" width="10" height="6" fill="#ffb7c5"/>
+            <rect x="4" y="16" width="3" height="2" fill="#ffb7c5"/>
+            <rect x="9" y="16" width="3" height="2" fill="#ffb7c5"/>
+            <rect x="13" y="12" width="3" height="2" fill="#ffb7c5"/>
+            <rect x="15" y="10" width="2" height="2" fill="#ffb7c5"/>
+          </svg>
+
+          <p class="pg-text" style="font-size:1.06rem">
+            I still remember the moment<br>
+            I first saw you... 🌸<br><br>
+            something just felt different.<br>
+            like my heart finally found<br>
+            the one it was looking for. 💕
+          </p>
+          <div class="nav">
+            <button class="btn" onclick="goToPage(0)">← Back</button>
+            <button class="btn" onclick="goToPage(2)">Next →</button>
+          </div>
+          <p class="pg-num">2 / 10</p>
+        </div>
+
+        <!-- ▓▓▓ PAGE 3 ▓▓▓ -->
+        <div class="page lined" id="p2">
+          <div class="corner" style="top:10px;left:12px">🌷</div>
+          <div class="corner" style="top:10px;right:12px">💌</div>
+          <p class="pg-title">Things I Love About You</p>
+          <div class="pg-divider"></div>
+          <div class="pg-list" style="padding:0 8px">
+            <div class="pg-item">The way you laugh 🌸</div>
+            <div class="pg-item">How warm your hugs feel</div>
+            <div class="pg-item">Your beautiful, kind heart 💕</div>
+            <div class="pg-item">How you make me feel safe</div>
+            <div class="pg-item">The way you care so deeply</div>
+            <div class="pg-item">Everything about you ✨</div>
+          </div>
+          <div class="nav">
+            <button class="btn" onclick="goToPage(1)">← Back</button>
+            <button class="btn" onclick="goToPage(3)">Next →</button>
+          </div>
+          <p class="pg-num">3 / 10</p>
+        </div>
+
+        <!-- ▓▓▓ PAGE 4 ▓▓▓ -->
+        <div class="page" id="p3">
+          <div class="corner" style="top:10px;left:12px">😸</div>
+          <div class="corner" style="top:10px;right:12px">💗</div>
+          <div class="accent-border"></div>
+          <p class="pg-title">You Make Me Smile</p>
+
+          <!-- happy waving cat -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="94" height="94"
+               style="image-rendering:pixelated;margin:6px 0 12px">
+            <rect x="2"  y="0" width="3" height="4" fill="#ffb7c5"/>
+            <rect x="19" y="0" width="3" height="4" fill="#ffb7c5"/>
+            <rect x="2"  y="3" width="20" height="11" fill="#ffb7c5"/>
+            <!-- happy squint eyes -->
+            <rect x="5"  y="6" width="5" height="2" fill="#5a4a4d"/>
+            <rect x="5"  y="6" width="1" height="1" fill="#ffb7c5"/>
+            <rect x="9"  y="6" width="1" height="1" fill="#ffb7c5"/>
+            <rect x="14" y="6" width="5" height="2" fill="#5a4a4d"/>
+            <rect x="14" y="6" width="1" height="1" fill="#ffb7c5"/>
+            <rect x="18" y="6" width="1" height="1" fill="#ffb7c5"/>
+            <!-- blush -->
+            <rect x="4"  y="9" width="3" height="1" fill="rgba(255,107,138,.4)"/>
+            <rect x="17" y="9" width="3" height="1" fill="rgba(255,107,138,.4)"/>
+            <!-- nose + mouth -->
+            <rect x="11" y="9"  width="2" height="1" fill="#ff6b8a"/>
+            <rect x="10" y="10" width="4" height="1" fill="#ff6b8a"/>
+            <!-- body -->
+            <rect x="3" y="14" width="16" height="8" fill="#ffb7c5"/>
+            <!-- waving paw -->
+            <rect class="a-paw" x="19" y="11" width="3" height="6" fill="#ffb7c5"/>
+            <rect class="a-paw" x="20" y="9"  width="2" height="2" fill="#ffb7c5"/>
+            <!-- other paw -->
+            <rect x="3" y="16" width="4" height="3" fill="#ffb7c5"/>
+            <!-- legs -->
+            <rect x="5"  y="22" width="4" height="2" fill="#ffb7c5"/>
+            <rect x="13" y="22" width="4" height="2" fill="#ffb7c5"/>
+          </svg>
+
+          <p class="pg-text">
+            ...when you send me good morning texts, 🌅<br>
+            when you laugh at my silly jokes,<br>
+            when you're just simply being <em>you</em>.<br><br>
+            you are my favorite reason to smile. 🌸
+          </p>
+          <div class="nav">
+            <button class="btn" onclick="goToPage(2)">← Back</button>
+            <button class="btn" onclick="goToPage(4)">Next →</button>
+          </div>
+          <p class="pg-num">4 / 10</p>
+        </div>
+
+        <!-- ▓▓▓ PAGE 5 ▓▓▓ -->
+        <div class="page lined" id="p4">
+          <div class="corner" style="top:10px;left:12px">🌺</div>
+          <div class="corner" style="top:10px;right:12px">📸</div>
+          <div class="tape" style="transform:translateX(-50%) rotate(2deg)"></div>
+          <p class="pg-title">Our Memories 🌸</p>
+          <div class="pg-divider"></div>
+          <p class="pg-text" style="font-size:1.06rem">
+            every moment with you<br>
+            becomes my new favorite. 📷<br><br>
+            the little things we share<br>
+            are my greatest treasures. 💎<br><br>
+            and I want a million more<br>
+            with you. ✨
+          </p>
+          <div class="nav">
+            <button class="btn" onclick="goToPage(3)">← Back</button>
+            <button class="btn" onclick="goToPage(5)">Next →</button>
+          </div>
+          <p class="pg-num">5 / 10</p>
+        </div>
+
+        <!-- ▓▓▓ PAGE 6 – two cats ▓▓▓ -->
+        <div class="page" id="p5">
+          <div class="corner" style="top:10px;left:12px">🐱</div>
+          <div class="corner" style="top:10px;right:12px">🐱</div>
+          <div class="accent-border"></div>
+          <p class="pg-title">That's Us 💕</p>
+
+          <div style="display:flex;gap:10px;align-items:flex-end;justify-content:center;margin:8px 0 14px">
+            <!-- cat 1 -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 18" width="72" height="72"
+                 style="image-rendering:pixelated">
+              <rect x="2"  y="0" width="2" height="3" fill="#ffb7c5"/>
+              <rect x="12" y="0" width="2" height="3" fill="#ffb7c5"/>
+              <rect x="2"  y="2" width="12" height="8" fill="#ffb7c5"/>
+              <rect x="4"  y="4" width="3" height="3" fill="#5a4a4d"/>
+              <rect x="5"  y="4" width="1" height="1" fill="white"/>
+              <rect x="9"  y="4" width="3" height="3" fill="#5a4a4d"/>
+              <rect x="10" y="4" width="1" height="1" fill="white"/>
+              <rect x="3"  y="7" width="2" height="1" fill="rgba(255,107,138,.38)"/>
+              <rect x="11" y="7" width="2" height="1" fill="rgba(255,107,138,.38)"/>
+              <rect x="7"  y="6" width="2" height="1" fill="#ff6b8a"/>
+              <rect x="3" y="10" width="10" height="6" fill="#ffb7c5"/>
+              <rect x="4" y="16" width="3" height="2" fill="#ffb7c5"/>
+              <rect x="9" y="16" width="3" height="2" fill="#ffb7c5"/>
+              <rect x="13" y="12" width="3" height="2" fill="#ffb7c5"/>
+            </svg>
+            <span style="font-size:1.6rem;padding-bottom:14px">💕</span>
+            <!-- cat 2 (pale, mirrored) -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 18" width="72" height="72"
+                 style="image-rendering:pixelated;transform:scaleX(-1)">
+              <rect x="2"  y="0" width="2" height="3" fill="#ffd6e0"/>
+              <rect x="12" y="0" width="2" height="3" fill="#ffd6e0"/>
+              <rect x="2"  y="2" width="12" height="8" fill="#ffd6e0"/>
+              <rect x="4"  y="4" width="3" height="3" fill="#5a4a4d"/>
+              <rect x="5"  y="4" width="1" height="1" fill="white"/>
+              <rect x="9"  y="4" width="3" height="3" fill="#5a4a4d"/>
+              <rect x="10" y="4" width="1" height="1" fill="white"/>
+              <rect x="3"  y="7" width="2" height="1" fill="rgba(255,107,138,.38)"/>
+              <rect x="11" y="7" width="2" height="1" fill="rgba(255,107,138,.38)"/>
+              <rect x="7"  y="6" width="2" height="1" fill="#ff8fa3"/>
+              <rect x="3" y="10" width="10" height="6" fill="#ffd6e0"/>
+              <rect x="4" y="16" width="3" height="2" fill="#ffd6e0"/>
+              <rect x="9" y="16" width="3" height="2" fill="#ffd6e0"/>
+              <rect x="13" y="12" width="3" height="2" fill="#ffd6e0"/>
+            </svg>
+          </div>
+
+          <p class="pg-text" style="font-size:1rem">
+            two silly little cats<br>
+            finding their way to each other. 🌸<br><br>
+            I'm so glad it's you. 💕
+          </p>
+          <div class="nav">
+            <button class="btn" onclick="goToPage(4)">← Back</button>
+            <button class="btn" onclick="goToPage(6)">Next →</button>
+          </div>
+          <p class="pg-num">6 / 10</p>
+        </div>
+
+        <!-- ▓▓▓ PAGE 7 – POEM ▓▓▓ -->
+        <div class="page lined" id="p6">
+          <div class="corner" style="top:10px;left:12px">🌷</div>
+          <div class="corner" style="top:10px;right:12px">🌷</div>
+          <div class="tape" style="transform:translateX(-50%) rotate(2deg)"></div>
+          <p class="pg-title">A Poem Just For You 🌷</p>
+          <div class="pg-divider"></div>
+          <p class="pg-text" style="font-style:italic;line-height:2.15;font-size:.98rem">
+            in a world of pixels and pink,<br>
+            you're every color I think,<br>
+            of when days go gray and blue —<br>
+            my heart resets to you. 🌸<br><br>
+            like a pixel cat on a screen,<br>
+            you're the sweetest thing I've seen.<br>
+            soft and warm and oh so true —<br>
+            I'm so lucky to have you. 💕
+          </p>
+          <div class="nav">
+            <button class="btn" onclick="goToPage(5)">← Back</button>
+            <button class="btn" onclick="goToPage(7)">Next →</button>
+          </div>
+          <p class="pg-num">7 / 10</p>
+        </div>
+
+        <!-- ▓▓▓ PAGE 8 ▓▓▓ -->
+        <div class="page" id="p7">
+          <div class="corner" style="top:10px;left:12px">🗺️</div>
+          <div class="corner" style="top:10px;right:12px">🌍</div>
+          <div class="accent-border"></div>
+          <p class="pg-title">Places I Want To Go</p>
+          <p class="pg-text" style="font-size:.88rem;margin-bottom:12px">with you by my side 🌏</p>
+
+          <!-- little walking cat -->
+          <svg class="a-bounce" xmlns="http://www.w3.org/2000/svg"
+               viewBox="0 0 18 14" width="72" height="56"
+               style="image-rendering:pixelated;margin-bottom:10px">
+            <rect x="0"  y="0" width="2" height="3" fill="#ffb7c5"/>
+            <rect x="4"  y="0" width="2" height="3" fill="#ffb7c5"/>
+            <rect x="0"  y="2" width="6" height="7" fill="#ffb7c5"/>
+            <rect x="1"  y="3" width="2" height="2" fill="#5a4a4d"/>
+            <rect x="2"  y="3" width="1" height="1" fill="white"/>
+            <rect x="4"  y="3" width="1" height="1" fill="#ff6b8a"/>
+            <rect x="6"  y="4" width="12" height="4" fill="#ffb7c5"/>
+            <rect x="15" y="2" width="3" height="2" fill="#ffb7c5"/>
+            <rect x="0"  y="9" width="6" height="5" fill="#ffb7c5"/>
+            <rect x="1"  y="14" width="2" height="2" fill="#ffb7c5"/>
+            <rect x="4"  y="13" width="2" height="3" fill="#ffb7c5"/>
+          </svg>
+
+          <div class="pg-list" style="padding:0 8px">
+            <div class="pg-item">a cozy café in the rain ☔</div>
+            <div class="pg-item">under a sky full of stars 🌟</div>
+            <div class="pg-item">a quiet place, just us two 🏡</div>
+            <div class="pg-item">anywhere you are 💕</div>
+          </div>
+          <div class="nav">
+            <button class="btn" onclick="goToPage(6)">← Back</button>
+            <button class="btn" onclick="goToPage(8)">Next →</button>
+          </div>
+          <p class="pg-num">8 / 10</p>
+        </div>
+
+        <!-- ▓▓▓ PAGE 9 ▓▓▓ -->
+        <div class="page lined" id="p8">
+          <div class="corner" style="top:10px;left:12px">💌</div>
+          <div class="corner" style="top:10px;right:12px">🌸</div>
+          <div class="tape" style="left:65%;transform:translateX(-50%) rotate(-3deg)"></div>
+          <p class="pg-title">My Promise To You</p>
+          <div class="pg-divider"></div>
+          <p class="pg-text" style="font-size:1.06rem">
+            I promise to make you smile<br>
+            on your hardest days. 🌸<br><br>
+            to be your safe place,<br>
+            your calm, your home. 🏡<br><br>
+            to always choose you,<br>
+            again and again. 💕
+          </p>
+          <p class="pg-text" style="font-size:.82rem;margin-top:10px;color:var(--mid)">
+            — always yours 💌
+          </p>
+          <div class="nav">
+            <button class="btn" onclick="goToPage(7)">← Back</button>
+            <button class="btn" onclick="goToPage(9)">Next →</button>
+          </div>
+          <p class="pg-num">9 / 10</p>
+        </div>
+
+        <!-- ▓▓▓ PAGE 10 – BACK COVER ▓▓▓ -->
+        <div class="page cover" id="p9">
+          <div class="deco" style="top:12px;left:14px">💕</div>
+          <div class="deco" style="top:12px;right:14px">🌸</div>
+          <div class="deco" style="bottom:52px;left:14px">✨</div>
+          <div class="deco" style="bottom:52px;right:14px">✨</div>
+          <div class="fheart" style="left:20%;animation-delay:0s">💕</div>
+          <div class="fheart" style="left:55%;animation-delay:1.1s">🌸</div>
+          <div class="fheart" style="left:78%;animation-delay:2.2s">💗</div>
+
+          <!-- crowned queen cat -->
+          <svg class="a-bounce" xmlns="http://www.w3.org/2000/svg"
+               viewBox="0 0 24 28" width="120" height="120"
+               style="image-rendering:pixelated;margin-bottom:10px">
+            <!-- crown -->
+            <rect x="5"  y="0" width="2" height="4" fill="#FFD700"/>
+            <rect x="9"  y="1" width="2" height="3" fill="#FFD700"/>
+            <rect x="13" y="0" width="2" height="4" fill="#FFD700"/>
+            <rect x="5"  y="3" width="11" height="2" fill="#FFD700"/>
+            <rect x="8"  y="3" width="1" height="1" fill="#ff6b8a"/>
+            <rect x="11" y="3" width="1" height="1" fill="#ff6b8a"/>
+            <rect x="14" y="3" width="1" height="1" fill="#ff6b8a"/>
+            <!-- ears -->
+            <rect x="3"  y="4" width="4" height="5" fill="rgba(255,255,255,.9)"/>
+            <rect x="17" y="4" width="4" height="5" fill="rgba(255,255,255,.9)"/>
+            <rect x="4"  y="4" width="2" height="4" fill="rgba(255,200,210,.5)"/>
+            <rect x="17" y="4" width="2" height="4" fill="rgba(255,200,210,.5)"/>
+            <!-- head -->
+            <rect x="3" y="7" width="18" height="11" fill="rgba(255,255,255,.9)"/>
+            <!-- happy closed eyes -->
+            <rect x="6"  y="10" width="5" height="2" fill="#ff6b8a"/>
+            <rect x="6"  y="10" width="1" height="1" fill="rgba(255,255,255,.9)"/>
+            <rect x="10" y="10" width="1" height="1" fill="rgba(255,255,255,.9)"/>
+            <rect x="13" y="10" width="5" height="2" fill="#ff6b8a"/>
+            <rect x="13" y="10" width="1" height="1" fill="rgba(255,255,255,.9)"/>
+            <rect x="17" y="10" width="1" height="1" fill="rgba(255,255,255,.9)"/>
+            <!-- blush -->
+            <rect x="4"  y="12" width="4" height="1" fill="rgba(255,107,138,.38)"/>
+            <rect x="16" y="12" width="4" height="1" fill="rgba(255,107,138,.38)"/>
+            <!-- nose + mouth -->
+            <rect x="11" y="13" width="2" height="1" fill="#ffb7c5"/>
+            <rect x="10" y="14" width="4" height="1" fill="#ffb7c5"/>
+            <!-- body -->
+            <rect x="4" y="18" width="16" height="8" fill="rgba(255,255,255,.9)"/>
+            <!-- heart on chest -->
+            <rect x="10" y="20" width="2" height="1" fill="#ff6b8a"/>
+            <rect x="12" y="20" width="2" height="1" fill="#ff6b8a"/>
+            <rect x="9"  y="21" width="6" height="2" fill="#ff6b8a"/>
+            <rect x="10" y="23" width="4" height="1" fill="#ff6b8a"/>
+            <rect x="11" y="24" width="2" height="1" fill="#ff6b8a"/>
+            <!-- paws -->
+            <rect x="5"  y="26" width="5" height="2" fill="rgba(255,255,255,.9)"/>
+            <rect x="14" y="26" width="5" height="2" fill="rgba(255,255,255,.9)"/>
+            <!-- tail -->
+            <rect class="a-tail" x="20" y="22" width="4" height="2" fill="rgba(255,255,255,.8)"/>
+            <rect class="a-tail" x="23" y="20" width="2" height="2" fill="rgba(255,255,255,.8)"/>
+          </svg>
+
+          <p class="pg-title" style="color:#fff;text-shadow:2px 2px 0 var(--pixel);font-size:.52rem">
+            ✦ Forever &amp; Always ✦
+          </p>
+          <p class="pg-text" style="margin-top:10px;line-height:1.85">
+            thank you for being<br>
+            my everything. 🌸<br><br>
+            — yours, always &amp; forever 💌
+          </p>
+          <div class="nav">
+            <button class="btn" onclick="goToPage(8)">← Back</button>
+          </div>
+        </div>
+
+      </div><!-- .book -->
+    </div><!-- #book-container -->
+  </div>
+</div><!-- #book-wrapper -->
+
+<script>
+  let cur = 0, busy = false;
+  const IDS = ['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9'];
+
+  function checkPass() {
+    if (document.getElementById('pass').value.toLowerCase() === 'seramma') {
+      const lock = document.getElementById('lock-screen');
+      lock.style.opacity = '0';
+      lock.style.pointerEvents = 'none';
+      setTimeout(() => {
+        lock.style.display = 'none';
+        document.getElementById('book-wrapper').style.display = 'block';
+      }, 650);
+    }
+  }
+
+  function goToPage(t) {
+    if (busy || t === cur || t < 0 || t >= IDS.length) return;
+    busy = true;
+
+    const d   = t > cur ? 'fwd' : 'bwd';
+    const cel = document.getElementById(IDS[cur]);
+    const tel = document.getElementById(IDS[t]);
+
+    cel.style.transformOrigin = d === 'fwd' ? 'left center' : 'right center';
+    cel.classList.add('fo-' + d);
+
+    setTimeout(() => {
+      cel.classList.remove('active', 'fo-' + d);
+      cel.style.transformOrigin = '';
+
+      tel.style.transformOrigin = d === 'fwd' ? 'right center' : 'left center';
+      tel.classList.add('active', 'fi-' + d);
+
+      setTimeout(() => {
+        tel.classList.remove('fi-' + d);
+        tel.style.transformOrigin = '';
+        cur = t;
+        busy = false;
+      }, 400);
+    }, 400);
+  }
+</script>
+</body>
+</html>
