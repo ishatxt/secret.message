@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Message For You 🎀</title>
+    <style>
+        :root {
+            --bg: #fff5f7;
+            --accent: #ffb7c5;
+            --text: #5a4a4d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Password Overlay */
+        #lock-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.5s ease;
+        }
+
+        input {
+            padding: 12px;
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            outline: none;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* Book Container */
+        #book-container {
+            display: none;
+            width: 80%;
+            max-width: 500px;
+            height: 400px;
+            perspective: 1000px;
+        }
+
+        .book {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            box-sizing: border-box;
+            background: white;
+            border-radius: 10px;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        .page h2 { color: var(--accent); }
+        
+        .nav-btns {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover { transform: scale(1.05); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="lock-screen">
+        <h2 style="color: #ff8fa3;">Enter Password 🎀</h2>
+        <input type="password" id="pass" placeholder="Type here..." oninput="checkPass()">
+    </div>
+
+    <div id="book-container">
+        <div class="book">
+            <div class="page active" id="p1">
+                <h2>Page 1</h2>
+                <p>I wanted to create something special for you.</p>
+                <div class="nav-btns">
+                    <button onclick="nextPage(2)">Next →</button>
+                </div>
+            </div>
+
+            <div class="page" id="p2">
+                <h2>Page 2</h2>
+                <p>Each page is a reminder of how glad I am that you're here.</p>
+                <div class="nav-btns">
+                    <button onclick="nextPage(1)">← Back</button>
+                    <button onclick="nextPage(3)">Next →</button>
+                </div>
+            </div>
+
+            <div class="page" id="p3">
+                <h2>The Final Note</h2>
+                <p>Insert your long, beautiful note here. You can add as many pages as you want! 🎀</p>
+                <div class="nav-btns">
+                    <button onclick="nextPage(2)">← Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkPass() {
+            const pass = document.getElementById('pass').value;
+            if (pass.toLowerCase() === 'seramma') {
+                document.getElementById('lock-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('book-container').style.display = 'block';
+                }, 500);
+            }
+        }
+
+        function nextPage(num) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('p' + num).classList.add('active');
+        }
+    </script>
+</body>
+</html>
