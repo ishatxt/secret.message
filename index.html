@@ -7,9 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Wooden Theme Palette */
       --bg-dark: #2d1b0d;      
-      --paper: rgba(244, 228, 188, 0.9); 
+      --paper: rgba(244, 228, 188, 0.95); 
       --acc: #8b4513;          
       --mid: #5d2e0a;          
       --deep: #3e1f07;         
@@ -30,7 +29,7 @@
       overflow: hidden;
     }
 
-    /* LOCK SCREEN SECTION WITH BACKGROUND.GIF */
+    /* LOCK SCREEN SECTION */
     #lock-screen {
       position: fixed; 
       inset: 0;
@@ -49,7 +48,7 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: rgba(0, 0, 0, 0.3);
+        background: rgba(0, 0, 0, 0.4);
         z-index: 1;
     }
 
@@ -77,7 +76,7 @@
       z-index: 2;
     }
 
-    /* JOURNAL SECTION WITH BACKGROUND2.GIF */
+    /* JOURNAL SECTION */
     #book-wrapper { 
       display: none; 
       position: fixed; 
@@ -109,8 +108,8 @@
     }
 
     #book-container {
-      width: min(430px, 90vw);
-      height: min(540px, 82vh);
+      width: min(450px, 90vw);
+      height: min(600px, 85vh);
       perspective: 1400px;
       position: relative;
     }
@@ -123,72 +122,36 @@
 
     .page {
       position: absolute; inset: 0;
-      display: none; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center;
-      padding: 28px 30px 58px;
+      display: flex; flex-direction: column;
       background: var(--paper);
       backdrop-filter: blur(4px); 
-      overflow: hidden;
       border: 1px solid rgba(212, 196, 156, 0.5);
-    }
-    
-    .page.lined {
-      background-image: repeating-linear-gradient(
-        transparent 0, transparent 27px,
-        var(--line) 27px, var(--line) 28px
-      ), linear-gradient(var(--paper), var(--paper));
-    }
-    .page.active { display: flex; }
-
-    /* Animations */
-    .page.fo-fwd { animation: foFwd .38s ease-in  forwards; }
-    .page.fi-fwd { animation: fiFwd .38s ease-out forwards; }
-    .page.fo-bwd { animation: foBwd .38s ease-in  forwards; }
-    .page.fi-bwd { animation: fiBwd .38s ease-out forwards; }
-
-    @keyframes foFwd { from{transform:rotateY(0)}    to{transform:rotateY(-90deg); opacity:0} }
-    @keyframes fiFwd { from{transform:rotateY(90deg); opacity:0}  to{transform:rotateY(0)} }
-    @keyframes foBwd { from{transform:rotateY(0)}    to{transform:rotateY(90deg);  opacity:0} }
-    @keyframes fiBwd { from{transform:rotateY(-90deg);opacity:0} to{transform:rotateY(0)} }
-
-    .page.cover {
-      background: linear-gradient(145deg, rgba(139, 69, 19, 0.9), rgba(62, 31, 7, 0.95)) !important;
+      padding: 40px 20px 20px;
     }
 
-    .pg-title {
-      font-size: clamp(.5rem, 2vw, .75rem);
-      color: #f4e4bc;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-      text-transform: uppercase;
+    /* Scrollable Content Styling */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+      text-align: left;
     }
+
+    /* Custom Wooden Scrollbar */
+    .content-area::-webkit-scrollbar { width: 8px; }
+    .content-area::-webkit-scrollbar-track { background: var(--line); }
+    .content-area::-webkit-scrollbar-thumb { background: var(--mid); border: 1px solid var(--pixel); }
 
     .pg-text {
       font-family: 'Press Start 2P', cursive;
-      font-size: clamp(0.55rem, 2.5vw, 0.75rem);
+      font-size: clamp(0.5rem, 2.2vw, 0.65rem);
       color: var(--text);
-      line-height: 2.2;
+      line-height: 2.5;
+      word-spacing: -2px;
     }
-    .cover .pg-text { color: rgba(244, 228, 188, 0.9); }
 
-    .pg-num { position:absolute; bottom:20px; right:14px; font-size:.33rem; color:var(--acc); }
-
-    .nav {
-      position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
-      display:flex; gap:12px; align-items:center;
-    }
-    .btn {
-      font-family:'Press Start 2P',monospace;
-      font-size:.42rem;
-      background: var(--mid); color:#f4e4bc;
-      border:2px solid var(--pixel);
-      padding:10px 16px;
-      cursor:pointer;
-      box-shadow:3px 3px 0 var(--pixel);
-      transition:transform .07s;
-    }
-    .btn:active { transform:translate(2px,2px); box-shadow:0 0 0 var(--pixel); }
+    .highlight { color: #a04d1d; }
+    .signature { margin-top: 30px; text-align: right; font-size: 0.6rem; }
 
   </style>
 </head>
@@ -211,58 +174,24 @@
 
     <div id="book-container">
       <div class="book">
-        <div class="page cover active" id="p0">
-          <p class="pg-title">A Message For You</p>
-          <p class="pg-text" style="margin-top:8px">Handcrafted</p>
-          <div class="nav">
-            <button class="btn" onclick="goToPage(1)">Open →</button>
+        <div class="page">
+          <div class="content-area">
+            <p class="pg-text">
+              I’ve spent a decade hiding parts of myself even the color of my eyes behind lenses and layers of code. I’ve spent years quietly checking if you’re online, waiting for the chance to talk, and prioritizing your messages over everything else in my world.
+              <br><br>
+              While most people look for something fleeting or physical, I’ve always been drawn to you exactly as you are. To me, your kindness and your presence mean more than words can usually capture. Whether I was helping you fix your laptop or building pixel-art sites to make you smile, every line of code I wrote was secretly for you.
+              <br><br>
+              The truth is simple: I don’t want to keep this a secret anymore. You were the "new girl" in my class ( 7th ), and from that first moment, I felt a connection I couldn't ignore. I’ve built websites, tools, and projects to truly show who am i , but I’ve never been brave enough to show you my heart until now.
+              <br><br>
+              I love you, <span class="highlight">Seramma</span>.
+              <br><br>
+              If you feel even a fraction of the same way, I’d love to stop hiding and finally be real with you. And if not, I hope you’ll keep this secret safe with me 😭, as a tribute to the years I’ve spent admiring you from afar.
+            </p>
+            <p class="pg-text signature">
+              Forever, <br>
+              i
+            </p>
           </div>
-        </div>
-
-        <div class="page lined" id="p1">
-          <p class="pg-text">Every moment with you is special.</p>
-          <div class="nav"><button class="btn" onclick="goToPage(0)">←</button><button class="btn" onclick="goToPage(2)">→</button></div>
-          <p class="pg-num">1/9</p>
-        </div>
-        <div class="page lined" id="p2">
-          <p class="pg-text">I wanted to create something small...</p>
-          <div class="nav"><button class="btn" onclick="goToPage(1)">←</button><button class="btn" onclick="goToPage(3)">→</button></div>
-          <p class="pg-num">2/9</p>
-        </div>
-        <div class="page lined" id="p3">
-          <p class="pg-text">...to show how much you mean to me.</p>
-          <div class="nav"><button class="btn" onclick="goToPage(2)">←</button><button class="btn" onclick="goToPage(4)">→</button></div>
-          <p class="pg-num">3/9</p>
-        </div>
-        <div class="page lined" id="p4">
-          <p class="pg-text">Thank you for being you.</p>
-          <div class="nav"><button class="btn" onclick="goToPage(3)">←</button><button class="btn" onclick="goToPage(5)">→</button></div>
-          <p class="pg-num">4/9</p>
-        </div>
-        <div class="page lined" id="p5">
-          <p class="pg-text">You are my favorite person.</p>
-          <div class="nav"><button class="btn" onclick="goToPage(4)">←</button><button class="btn" onclick="goToPage(6)">→</button></div>
-          <p class="pg-num">5/9</p>
-        </div>
-        <div class="page lined" id="p6">
-          <p class="pg-text">Keep shining bright!</p>
-          <div class="nav"><button class="btn" onclick="goToPage(5)">←</button><button class="btn" onclick="goToPage(7)">→</button></div>
-          <p class="pg-num">6/9</p>
-        </div>
-        <div class="page lined" id="p7">
-          <p class="pg-text">I'm always here for you.</p>
-          <div class="nav"><button class="btn" onclick="goToPage(6)">←</button><button class="btn" onclick="goToPage(8)">→</button></div>
-          <p class="pg-num">7/9</p>
-        </div>
-        <div class="page lined" id="p8">
-          <p class="pg-text">Always and forever.</p>
-          <div class="nav"><button class="btn" onclick="goToPage(7)">←</button><button class="btn" onclick="goToPage(9)">→</button></div>
-          <p class="pg-num">8/9</p>
-        </div>
-        <div class="page lined" id="p9">
-          <p class="pg-text">The End.<br>🤎</p>
-          <div class="nav"><button class="btn" onclick="goToPage(8)">←</button></div>
-          <p class="pg-num">9/9</p>
         </div>
       </div>
     </div>
@@ -270,8 +199,6 @@
 </div>
 
 <script>
-  let cur = 0, busy = false;
-  const IDS = ['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9'];
   const music = document.getElementById('bg-music');
 
   function checkPass() {
@@ -279,8 +206,7 @@
       const lock = document.getElementById('lock-screen');
       const book = document.getElementById('book-wrapper');
       
-      // Start Playing Music
-      music.play().catch(error => console.log("Auto-play blocked, browser needs interaction: ", error));
+      music.play().catch(e => console.log("Audio play deferred"));
 
       lock.style.opacity = '0';
       setTimeout(() => {
@@ -288,19 +214,6 @@
         book.style.display = 'flex';
       }, 650);
     }
-  }
-
-  function goToPage(t) {
-    if (busy || t === cur) return;
-    busy = true;
-    const d = t > cur ? 'fwd' : 'bwd';
-    const cel = document.getElementById(IDS[cur]), tel = document.getElementById(IDS[t]);
-    cel.classList.add('fo-' + d);
-    setTimeout(() => {
-      cel.classList.remove('active', 'fo-' + d);
-      tel.classList.add('active', 'fi-' + d);
-      setTimeout(() => { tel.classList.remove('fi-' + d); cur = t; busy = false; }, 400);
-    }, 400);
   }
 </script>
 </body>
