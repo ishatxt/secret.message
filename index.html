@@ -9,7 +9,7 @@
     :root {
       /* Wooden Theme Palette */
       --bg-dark: #2d1b0d;      
-      --paper: rgba(244, 228, 188, 0.9); /* Transparent to see GIF behind */
+      --paper: rgba(244, 228, 188, 0.9); 
       --acc: #8b4513;          
       --mid: #5d2e0a;          
       --deep: #3e1f07;         
@@ -45,7 +45,6 @@
       transition: opacity .6s ease;
     }
 
-    /* Overlay to make the password box pop against the GIF */
     #lock-screen::before {
         content: '';
         position: absolute;
@@ -129,7 +128,7 @@
       text-align: center;
       padding: 28px 30px 58px;
       background: var(--paper);
-      backdrop-filter: blur(4px); /* Lets GIF colors bleed through slightly */
+      backdrop-filter: blur(4px); 
       overflow: hidden;
       border: 1px solid rgba(212, 196, 156, 0.5);
     }
@@ -142,7 +141,7 @@
     }
     .page.active { display: flex; }
 
-    /* Page Flip Animations */
+    /* Animations */
     .page.fo-fwd { animation: foFwd .38s ease-in  forwards; }
     .page.fi-fwd { animation: fiFwd .38s ease-out forwards; }
     .page.fo-bwd { animation: foBwd .38s ease-in  forwards; }
@@ -194,6 +193,8 @@
   </style>
 </head>
 <body>
+
+<audio id="bg-music" src="guitar.mp3" loop></audio>
 
 <div id="lock-screen">
   <h1 class="lock-title">Enter Password</h1>
@@ -271,13 +272,16 @@
 <script>
   let cur = 0, busy = false;
   const IDS = ['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9'];
+  const music = document.getElementById('bg-music');
 
   function checkPass() {
-    // Password check remains case-insensitive
     if (document.getElementById('pass').value.toLowerCase() === 'seramma') {
       const lock = document.getElementById('lock-screen');
       const book = document.getElementById('book-wrapper');
       
+      // Start Playing Music
+      music.play().catch(error => console.log("Auto-play blocked, browser needs interaction: ", error));
+
       lock.style.opacity = '0';
       setTimeout(() => {
         lock.style.display = 'none';
