@@ -4,17 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>A Message For You</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:     #fff0f5;
-      --paper:  rgba(255, 251, 252, 0.9); /* Slightly transparent to see GIF */
-      --acc:    #ffb7c5;
-      --mid:    #ff8fa3;
-      --deep:   #e8547a;
-      --pixel:  #c94368;
-      --text:   #5a4a4d;
-      --line:   rgba(255,183,197,0.35);
+      /* Wooden Theme Palette */
+      --bg: #2d1b0d;           /* Dark wood background */
+      --paper: #f4e4bc;        /* Aged parchment color */
+      --acc: #8b4513;          /* Saddle brown */
+      --mid: #5d2e0a;          /* Mid-tone wood */
+      --deep: #3e1f07;         /* Deep bark color */
+      --pixel: #221104;        /* Darkest shadow */
+      --text: #4a2c16;         /* Brownish text */
+      --line: rgba(139, 69, 19, 0.15); /* Faint wooden lines */
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,6 +23,8 @@
     body {
       font-family: 'Press Start 2P', monospace;
       background: var(--bg);
+      /* Fallback texture if GIF is missing */
+      background-image: repeating-linear-gradient(45deg, #3a2210 0px, #3a2210 2px, #2d1b0d 2px, #2d1b0d 10px);
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -33,8 +36,7 @@
     #lock-screen {
       position: fixed; 
       inset: 0;
-      background: url('Background.gif') no-repeat center center;
-      background-size: cover;
+      background: rgba(0,0,0,0.4);
       display: flex; 
       flex-direction: column;
       align-items: center; 
@@ -47,8 +49,8 @@
     .lock-title {
       position: relative;
       font-size: clamp(.6rem, 2.5vw, .85rem);
-      color: var(--deep);
-      text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+      color: #f4e4bc;
+      text-shadow: 2px 2px 0 var(--deep);
       text-align: center;
       letter-spacing: 2px;
       z-index: 2;
@@ -59,25 +61,21 @@
       font-family: 'Press Start 2P', monospace;
       font-size: .62rem;
       padding: 14px 24px;
-      border: 3px solid var(--deep);
-      background: white;
+      border: 4px solid var(--mid);
+      background: #f4e4bc;
       color: var(--text);
       outline: none;
       text-align: center;
-      box-shadow: 4px 4px 0 var(--pixel);
+      box-shadow: 6px 6px 0 var(--pixel);
       z-index: 2;
     }
 
-    /* JOURNAL SECTION - GIF BACKGROUND ADDED HERE */
+    /* JOURNAL SECTION */
     #book-wrapper { 
       display: none; 
       position: fixed; 
       inset: 0;
-      background: url('Background2.gif') no-repeat center center;
-      background-size: cover;
       z-index: 10;
-      /* Using flex to center the book over the GIF */
-      display: none; 
       justify-content: center;
       align-items: center;
     }
@@ -86,18 +84,19 @@
       position: absolute;
       left: -22px; top: 0;
       width: 22px; height: 100%;
-      background: var(--deep);
+      background: var(--mid);
       box-shadow: -3px 0 0 var(--pixel);
       border-radius: 4px 0 0 4px;
       display: flex; flex-direction: column;
       align-items: center; justify-content: space-around;
       padding: 14px 0;
+      border-left: 2px solid #8b4513;
     }
     .ring {
-      width: 16px; height: 16px;
+      width: 14px; height: 14px;
       border-radius: 50%;
-      border: 3px solid #fff0f5;
-      background: var(--pixel);
+      border: 2px solid #5a3821;
+      background: #221104;
     }
 
     #book-container {
@@ -110,7 +109,7 @@
     .book {
       width: 100%; height: 100%;
       position: relative;
-      box-shadow: 8px 8px 0 var(--pixel), 13px 13px 0 rgba(0,0,0,0.2);
+      box-shadow: 8px 8px 0 var(--pixel), 13px 13px 20px rgba(0,0,0,0.5);
     }
 
     .page {
@@ -120,9 +119,10 @@
       text-align: center;
       padding: 28px 30px 58px;
       background: var(--paper);
-      backdrop-filter: blur(2px); /* Softens the GIF behind the page */
       overflow: hidden;
+      border: 1px solid #d4c49c;
     }
+    
     .page.lined {
       background-image: repeating-linear-gradient(
         transparent 0, transparent 27px,
@@ -143,27 +143,29 @@
     @keyframes fiBwd { from{transform:rotateY(-90deg);opacity:0} to{transform:rotateY(0)} }
 
     .page.cover {
-      background: linear-gradient(145deg,#ffb7c5,#ff6b8a,#e8547a) !important;
+      background: linear-gradient(145deg, #8b4513, #5d2e0a, #3e1f07) !important;
     }
 
     .pg-title {
-      font-size: clamp(.42rem,1.7vw,.63rem);
-      color: var(--deep);
+      font-size: clamp(.5rem, 2vw, .75rem);
+      color: var(--paper);
       letter-spacing: 1px;
       margin-bottom: 12px;
+      text-transform: uppercase;
     }
-    .cover .pg-title { color:#fff; text-shadow:2px 2px 0 var(--pixel); }
+    .cover .pg-title { color: #f4e4bc; text-shadow: 2px 2px 0 var(--pixel); }
 
     .pg-text {
-      font-family: 'Caveat', cursive;
-      font-size: clamp(1.2rem,4vw,1.4rem);
+      /* Changed font to pixelated for the notes */
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(0.6rem, 3vw, 0.8rem);
       color: var(--text);
-      line-height: 1.6;
-      font-weight: 700;
+      line-height: 2;
+      font-weight: normal;
     }
-    .cover .pg-text { color: rgba(255,255,255,.95); }
+    .cover .pg-text { color: rgba(244, 228, 188, 0.9); }
 
-    .pg-num { position:absolute; bottom:20px; right:14px; font-size:.33rem; color:var(--pixel); }
+    .pg-num { position:absolute; bottom:20px; right:14px; font-size:.33rem; color:var(--acc); }
 
     .nav {
       position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
@@ -172,9 +174,9 @@
     .btn {
       font-family:'Press Start 2P',monospace;
       font-size:.42rem;
-      background:var(--mid); color:#fff;
-      border:2px solid var(--deep);
-      padding:8px 14px;
+      background: var(--mid); color:#f4e4bc;
+      border:2px solid var(--pixel);
+      padding:10px 16px;
       cursor:pointer;
       box-shadow:3px 3px 0 var(--pixel);
       transition:transform .07s;
@@ -187,7 +189,7 @@
 
 <div id="lock-screen">
   <h1 class="lock-title">Enter Password</h1>
-  <input type="password" id="pass" placeholder="type here" oninput="checkPass()" autocomplete="off">
+  <input type="text" id="pass" placeholder="type here" oninput="checkPass()" autocomplete="off">
 </div>
 
 <div id="book-wrapper">
@@ -202,9 +204,9 @@
       <div class="book">
         <div class="page cover active" id="p0">
           <p class="pg-title">A Message For You</p>
-          <p class="pg-text" style="margin-top:8px">made with love</p>
+          <p class="pg-text" style="margin-top:8px">Handcrafted</p>
           <div class="nav">
-            <button class="btn" onclick="goToPage(1)">Open Journal →</button>
+            <button class="btn" onclick="goToPage(1)">Open →</button>
           </div>
         </div>
 
@@ -249,7 +251,7 @@
           <p class="pg-num">8/9</p>
         </div>
         <div class="page lined" id="p9">
-          <p class="pg-text">The End.<br>❤️</p>
+          <p class="pg-text">The End.<br>🤎</p>
           <div class="nav"><button class="btn" onclick="goToPage(8)">←</button></div>
           <p class="pg-num">9/9</p>
         </div>
@@ -263,7 +265,6 @@
   const IDS = ['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9'];
 
   function checkPass() {
-    // Password remains 'seramma'
     if (document.getElementById('pass').value.toLowerCase() === 'seramma') {
       const lock = document.getElementById('lock-screen');
       const book = document.getElementById('book-wrapper');
@@ -271,7 +272,7 @@
       lock.style.opacity = '0';
       setTimeout(() => {
         lock.style.display = 'none';
-        book.style.display = 'flex'; // Changed to flex for centering
+        book.style.display = 'flex';
       }, 650);
     }
   }
