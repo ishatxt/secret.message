@@ -8,7 +8,7 @@
   <style>
     :root {
       --bg:     #fff0f5;
-      --paper:  #fffbfc;
+      --paper:  rgba(255, 251, 252, 0.9); /* Slightly transparent to see GIF */
       --acc:    #ffb7c5;
       --mid:    #ff8fa3;
       --deep:   #e8547a;
@@ -27,18 +27,6 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
-    }
-
-    /* Grid Overlay */
-    body::after {
-      content: '';
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,183,197,.18) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,183,197,.18) 1px, transparent 1px);
-      background-size: 32px 32px;
-      pointer-events: none;
-      z-index: 1;
     }
 
     /* LOCK SCREEN SECTION */
@@ -72,7 +60,7 @@
       font-size: .62rem;
       padding: 14px 24px;
       border: 3px solid var(--deep);
-      background: var(--paper);
+      background: white;
       color: var(--text);
       outline: none;
       text-align: center;
@@ -80,8 +68,19 @@
       z-index: 2;
     }
 
-    /* JOURNAL SECTION */
-    #book-wrapper { display: none; position: relative; z-index: 10; }
+    /* JOURNAL SECTION - GIF BACKGROUND ADDED HERE */
+    #book-wrapper { 
+      display: none; 
+      position: fixed; 
+      inset: 0;
+      background: url('Background2.gif') no-repeat center center;
+      background-size: cover;
+      z-index: 10;
+      /* Using flex to center the book over the GIF */
+      display: none; 
+      justify-content: center;
+      align-items: center;
+    }
 
     .spine {
       position: absolute;
@@ -111,7 +110,7 @@
     .book {
       width: 100%; height: 100%;
       position: relative;
-      box-shadow: 8px 8px 0 var(--pixel), 13px 13px 0 rgba(201,67,104,.3);
+      box-shadow: 8px 8px 0 var(--pixel), 13px 13px 0 rgba(0,0,0,0.2);
     }
 
     .page {
@@ -121,16 +120,18 @@
       text-align: center;
       padding: 28px 30px 58px;
       background: var(--paper);
+      backdrop-filter: blur(2px); /* Softens the GIF behind the page */
       overflow: hidden;
     }
     .page.lined {
       background-image: repeating-linear-gradient(
         transparent 0, transparent 27px,
         var(--line) 27px, var(--line) 28px
-      );
+      ), linear-gradient(var(--paper), var(--paper));
     }
     .page.active { display: flex; }
 
+    /* Animations */
     .page.fo-fwd { animation: foFwd .38s ease-in  forwards; }
     .page.fi-fwd { animation: fiFwd .38s ease-out forwards; }
     .page.fo-bwd { animation: foBwd .38s ease-in  forwards; }
@@ -155,13 +156,14 @@
 
     .pg-text {
       font-family: 'Caveat', cursive;
-      font-size: clamp(1rem,3.5vw,1.18rem);
+      font-size: clamp(1.2rem,4vw,1.4rem);
       color: var(--text);
-      line-height: 1.9;
+      line-height: 1.6;
+      font-weight: 700;
     }
     .cover .pg-text { color: rgba(255,255,255,.95); }
 
-    .pg-num { position:absolute; bottom:20px; right:14px; font-size:.33rem; color:var(--acc); }
+    .pg-num { position:absolute; bottom:20px; right:14px; font-size:.33rem; color:var(--pixel); }
 
     .nav {
       position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
@@ -177,7 +179,7 @@
       box-shadow:3px 3px 0 var(--pixel);
       transition:transform .07s;
     }
-    .btn:active { transform:translate(3px,3px); box-shadow:0 0 0 var(--pixel); }
+    .btn:active { transform:translate(2px,2px); box-shadow:0 0 0 var(--pixel); }
 
   </style>
 </head>
@@ -261,12 +263,15 @@
   const IDS = ['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9'];
 
   function checkPass() {
+    // Password remains 'seramma'
     if (document.getElementById('pass').value.toLowerCase() === 'seramma') {
       const lock = document.getElementById('lock-screen');
+      const book = document.getElementById('book-wrapper');
+      
       lock.style.opacity = '0';
       setTimeout(() => {
         lock.style.display = 'none';
-        document.getElementById('book-wrapper').style.display = 'block';
+        book.style.display = 'flex'; // Changed to flex for centering
       }, 650);
     }
   }
