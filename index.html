@@ -8,23 +8,21 @@
   <style>
     :root {
       /* Wooden Theme Palette */
-      --bg: #2d1b0d;           /* Dark wood background */
-      --paper: #f4e4bc;        /* Aged parchment color */
-      --acc: #8b4513;          /* Saddle brown */
-      --mid: #5d2e0a;          /* Mid-tone wood */
-      --deep: #3e1f07;         /* Deep bark color */
-      --pixel: #221104;        /* Darkest shadow */
-      --text: #4a2c16;         /* Brownish text */
-      --line: rgba(139, 69, 19, 0.15); /* Faint wooden lines */
+      --bg-dark: #2d1b0d;      
+      --paper: rgba(244, 228, 188, 0.9); /* Transparent to see GIF behind */
+      --acc: #8b4513;          
+      --mid: #5d2e0a;          
+      --deep: #3e1f07;         
+      --pixel: #221104;        
+      --text: #4a2c16;         
+      --line: rgba(139, 69, 19, 0.15); 
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Press Start 2P', monospace;
-      background: var(--bg);
-      /* Fallback texture if GIF is missing */
-      background-image: repeating-linear-gradient(45deg, #3a2210 0px, #3a2210 2px, #2d1b0d 2px, #2d1b0d 10px);
+      background: var(--bg-dark);
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -32,11 +30,12 @@
       overflow: hidden;
     }
 
-    /* LOCK SCREEN SECTION */
+    /* LOCK SCREEN SECTION WITH BACKGROUND.GIF */
     #lock-screen {
       position: fixed; 
       inset: 0;
-      background: rgba(0,0,0,0.4);
+      background: url('Background.gif') no-repeat center center;
+      background-size: cover;
       display: flex; 
       flex-direction: column;
       align-items: center; 
@@ -44,6 +43,15 @@
       z-index: 300;
       gap: 20px;
       transition: opacity .6s ease;
+    }
+
+    /* Overlay to make the password box pop against the GIF */
+    #lock-screen::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 1;
     }
 
     .lock-title {
@@ -70,11 +78,13 @@
       z-index: 2;
     }
 
-    /* JOURNAL SECTION */
+    /* JOURNAL SECTION WITH BACKGROUND2.GIF */
     #book-wrapper { 
       display: none; 
       position: fixed; 
       inset: 0;
+      background: url('Background2.gif') no-repeat center center;
+      background-size: cover;
       z-index: 10;
       justify-content: center;
       align-items: center;
@@ -109,7 +119,7 @@
     .book {
       width: 100%; height: 100%;
       position: relative;
-      box-shadow: 8px 8px 0 var(--pixel), 13px 13px 20px rgba(0,0,0,0.5);
+      box-shadow: 8px 8px 0 var(--pixel), 13px 13px 25px rgba(0,0,0,0.6);
     }
 
     .page {
@@ -119,8 +129,9 @@
       text-align: center;
       padding: 28px 30px 58px;
       background: var(--paper);
+      backdrop-filter: blur(4px); /* Lets GIF colors bleed through slightly */
       overflow: hidden;
-      border: 1px solid #d4c49c;
+      border: 1px solid rgba(212, 196, 156, 0.5);
     }
     
     .page.lined {
@@ -131,7 +142,7 @@
     }
     .page.active { display: flex; }
 
-    /* Animations */
+    /* Page Flip Animations */
     .page.fo-fwd { animation: foFwd .38s ease-in  forwards; }
     .page.fi-fwd { animation: fiFwd .38s ease-out forwards; }
     .page.fo-bwd { animation: foBwd .38s ease-in  forwards; }
@@ -143,25 +154,22 @@
     @keyframes fiBwd { from{transform:rotateY(-90deg);opacity:0} to{transform:rotateY(0)} }
 
     .page.cover {
-      background: linear-gradient(145deg, #8b4513, #5d2e0a, #3e1f07) !important;
+      background: linear-gradient(145deg, rgba(139, 69, 19, 0.9), rgba(62, 31, 7, 0.95)) !important;
     }
 
     .pg-title {
       font-size: clamp(.5rem, 2vw, .75rem);
-      color: var(--paper);
+      color: #f4e4bc;
       letter-spacing: 1px;
       margin-bottom: 12px;
       text-transform: uppercase;
     }
-    .cover .pg-title { color: #f4e4bc; text-shadow: 2px 2px 0 var(--pixel); }
 
     .pg-text {
-      /* Changed font to pixelated for the notes */
       font-family: 'Press Start 2P', cursive;
-      font-size: clamp(0.6rem, 3vw, 0.8rem);
+      font-size: clamp(0.55rem, 2.5vw, 0.75rem);
       color: var(--text);
-      line-height: 2;
-      font-weight: normal;
+      line-height: 2.2;
     }
     .cover .pg-text { color: rgba(244, 228, 188, 0.9); }
 
@@ -265,6 +273,7 @@
   const IDS = ['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9'];
 
   function checkPass() {
+    // Password check remains case-insensitive
     if (document.getElementById('pass').value.toLowerCase() === 'seramma') {
       const lock = document.getElementById('lock-screen');
       const book = document.getElementById('book-wrapper');
