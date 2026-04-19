@@ -1,191 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Secret message🎀</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Lovers+Quarrel&family=Press+Start+2P&display=swap" rel="stylesheet">
-  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Message For You</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    /* Integrated Styles from frontendfocus.css and Lock Screen */
     :root {
-      --bg: #fff0f5;
-      --deep: #e8547a;
-      --pixel: #c94368;
-      --text: #5a4a4d;
+      --bg:     #fff0f5;
+      --paper:  #fffbfc;
+      --acc:    #ffb7c5;
+      --mid:    #ff8fa3;
+      --deep:   #e8547a;
+      --pixel:  #c94368;
+      --text:   #5a4a4d;
+      --line:   rgba(255,183,197,0.35);
     }
 
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
+      font-family: 'Press Start 2P', monospace;
+      background: var(--bg);
       min-height: 100vh;
-      margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
-      font-family: 'Poppins', sans-serif;
       overflow: hidden;
     }
 
-    /* --- Lock Screen Styles --- */
+    /* Grid Overlay (only visible on body/journal) */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,183,197,.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,183,197,.18) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* LOCK SCREEN SECTION */
     #lock-screen {
       position: fixed; 
       inset: 0;
-      background: var(--bg);
+      background: url('https://i.pinimg.com/originals/72/bd/bd/72bdbd20d38ab581aba4eac36a94ffae.gif') no-repeat center center;
+      background-size: cover;
       display: flex; 
       flex-direction: column;
       align-items: center; 
       justify-content: center;
-      z-index: 1000;
+      z-index: 300;
       gap: 20px;
       transition: opacity .6s ease;
     }
 
+    /* No overlay here - removed the ::before tint */
+
     .lock-title {
-      font-family: 'Press Start 2P', cursive;
-      font-size: 14px;
+      position: relative;
+      font-size: clamp(.6rem, 2.5vw, .85rem);
       color: var(--deep);
-      text-shadow: 2px 2px 0 rgba(232,84,122,.2);
+      /* Added stronger shadow for visibility against the raw GIF */
+      text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+      text-align: center;
+      letter-spacing: 2px;
+      z-index: 2;
     }
 
     #pass {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 12px;
-      padding: 14px;
-      border: 3px solid #ff8fa3;
-      background: #fffbfc;
-      text-align: center;
-      box-shadow: 4px 4px 0 var(--deep);
-      outline: none;
-    }
-
-    .a-float { animation: lockFloat 2s ease-in-out infinite; }
-    @keyframes lockFloat { 
-      0%, 100% { transform: translateY(0) rotate(-2deg); } 
-      50% { transform: translateY(-12px) rotate(2deg); } 
-    }
-
-    /* --- 3D Book Styles --- */
-    .book {
-      display: none; /* Hidden until password is correct */
-      perspective: 200vw;
-      transition: opacity 0.4s 0.2s;
-    }
-
-    .pages {
-      width: 60vw;
-      height: 44vw;
       position: relative;
-      transform-style: preserve-3d;
-      backface-visibility: hidden;
-      border-radius: 8px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+      font-family: 'Press Start 2P', monospace;
+      font-size: .62rem;
+      padding: 14px 24px;
+      border: 3px solid var(--deep);
+      background: var(--paper);
+      color: var(--text);
+      outline: none;
+      text-align: center;
+      box-shadow: 4px 4px 0 var(--pixel);
+      z-index: 2;
+    }
+
+    /* JOURNAL SECTION */
+    #book-wrapper { display: none; position: relative; z-index: 10; }
+
+    .spine {
+      position: absolute;
+      left: -22px; top: 0;
+      width: 22px; height: 100%;
+      background: var(--deep);
+      box-shadow: -3px 0 0 var(--pixel);
+      border-radius: 4px 0 0 4px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: space-around;
+      padding: 14px 0;
+    }
+    .ring {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      border: 3px solid #fff0f5;
+      background: var(--pixel);
+    }
+
+    #book-container {
+      width: min(430px, 90vw);
+      height: min(540px, 82vh);
+      perspective: 1400px;
+      position: relative;
+    }
+
+    .book {
+      width: 100%; height: 100%;
+      position: relative;
+      box-shadow: 8px 8px 0 var(--pixel), 13px 13px 0 rgba(201,67,104,.3);
     }
 
     .page {
-      position: absolute;
-      top: 0;
-      width: 30vw;
-      height: 44vw;
-      transform-origin: left;
-      transition: transform 1.2s ease-in-out;
-      backface-visibility: hidden;
-      border-radius: 8px;
-      cursor: pointer;
-      user-select: none;
-      background: #faf8f6 url('https://www.transparenttextures.com/patterns/paper-fibers.png');
-      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.05);
-    }
-
-    .page:nth-child(odd) { transform-origin: left; right: 0; background-image: linear-gradient(to right, rgba(0,0,0,0.1), rgba(0,0,0,0)); }
-    .page:nth-child(even) { transform-origin: right; left: 0; transform: rotateY(180deg); background-image: linear-gradient(to left, rgba(0,0,0,0.1), rgba(0,0,0,0)); }
-    
-    .page.flipped:nth-child(odd) { transform: rotateY(-180deg); }
-    .page.flipped:nth-child(even) { transform: rotateY(0deg); }
-
-    .page p {
-      font-family: 'Lovers Quarrel', cursive;
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
       text-align: center;
-      font-size: 4vw;
-      margin: 0;
-      color: #333;
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
+      padding: 28px 30px 58px;
+      background: var(--paper);
+      overflow: hidden;
+    }
+    .page.lined {
+      background-image: repeating-linear-gradient(
+        transparent 0, transparent 27px,
+        var(--line) 27px, var(--line) 28px
+      );
+    }
+    .page.active { display: flex; }
+
+    .page.fo-fwd { animation: foFwd .38s ease-in  forwards; }
+    .page.fi-fwd { animation: fiFwd .38s ease-out forwards; }
+    .page.fo-bwd { animation: foBwd .38s ease-in  forwards; }
+    .page.fi-bwd { animation: fiBwd .38s ease-out forwards; }
+
+    @keyframes foFwd { from{transform:rotateY(0)}    to{transform:rotateY(-90deg); opacity:0} }
+    @keyframes fiFwd { from{transform:rotateY(90deg); opacity:0}  to{transform:rotateY(0)} }
+    @keyframes foBwd { from{transform:rotateY(0)}    to{transform:rotateY(90deg);  opacity:0} }
+    @keyframes fiBwd { from{transform:rotateY(-90deg);opacity:0} to{transform:rotateY(0)} }
+
+    .page.cover {
+      background: linear-gradient(145deg,#ffb7c5,#ff6b8a,#e8547a) !important;
     }
 
-    @media (max-width: 768px) {
-      .pages { width: 90vw; height: 65vw; }
-      .page { width: 45vw; height: 65vw; }
+    .pg-title {
+      font-size: clamp(.42rem,1.7vw,.63rem);
+      color: var(--deep);
+      letter-spacing: 1px;
+      margin-bottom: 12px;
     }
+    .cover .pg-title { color:#fff; text-shadow:2px 2px 0 var(--pixel); }
+
+    .pg-text {
+      font-family: 'Caveat', cursive;
+      font-size: clamp(1rem,3.5vw,1.18rem);
+      color: var(--text);
+      line-height: 1.9;
+    }
+    .cover .pg-text { color: rgba(255,255,255,.95); }
+
+    .pg-num { position:absolute; bottom:20px; right:14px; font-size:.33rem; color:var(--acc); }
+
+    .nav {
+      position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+      display:flex; gap:12px; align-items:center;
+    }
+    .btn {
+      font-family:'Press Start 2P',monospace;
+      font-size:.42rem;
+      background:var(--mid); color:#fff;
+      border:2px solid var(--deep);
+      padding:8px 14px;
+      cursor:pointer;
+      box-shadow:3px 3px 0 var(--pixel);
+      transition:transform .07s;
+    }
+    .btn:active { transform:translate(3px,3px); box-shadow:0 0 0 var(--pixel); }
+
+    /* Animations */
+    @keyframes lockFloat { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-12px) rotate(2deg)} }
+    @keyframes eyeBlink  { 0%,87%,100%{transform:scaleY(1)} 91%{transform:scaleY(.07)} }
+    @keyframes tailWag   { 0%,100%{transform:rotate(-14deg)} 50%{transform:rotate(14deg)} }
+
+    .a-float  { animation: lockFloat 2s ease-in-out infinite; position: relative; z-index: 2;}
+    .a-blink  { animation: eyeBlink 3.6s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+    .a-tail   { animation: tailWag  .9s ease-in-out infinite;  transform-box:fill-box; transform-origin:left center; }
   </style>
 </head>
 <body>
 
 <div id="lock-screen">
-  <img class="a-float" 
-       src="cat-pixel.gif" 
-       alt="Pixel Cat" 
-       style="width: 120px; height: auto; image-rendering: pixelated;">
+  <svg class="a-float" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 24" width="116" height="116" style="image-rendering:pixelated">
+    <rect x="2"  y="0" width="3" height="4" fill="#ffb7c5"/>
+    <rect x="17" y="0" width="3" height="4" fill="#ffb7c5"/>
+    <rect x="3"  y="0" width="1" height="3" fill="#ff8fa3"/>
+    <rect x="17" y="0" width="1" height="3" fill="#ff8fa3"/>
+    <rect x="2" y="3" width="18" height="11" fill="#ffb7c5"/>
+    <rect class="a-blink" x="5"  y="6" width="4" height="3" fill="#5a4a4d"/>
+    <rect x="6"  y="6" width="1" height="1" fill="white"/>
+    <rect class="a-blink" x="13" y="6" width="4" height="3" fill="#5a4a4d"/>
+    <rect x="14" y="6" width="1" height="1" fill="white"/>
+    <rect x="10" y="9" width="2" height="1" fill="#ff6b8a"/>
+    <rect x="3" y="14" width="16" height="8" fill="#ffb7c5"/>
+    <rect x="4"  y="22" width="4" height="2" fill="#ffb7c5"/>
+    <rect x="14" y="22" width="4" height="2" fill="#ffb7c5"/>
+    <rect class="a-tail" x="19" y="18" width="3" height="2" fill="#ffb7c5"/>
+    <rect class="a-tail" x="21" y="16" width="2" height="2" fill="#ffb7c5"/>
+  </svg>
   
   <h1 class="lock-title">Enter Password</h1>
   <input type="password" id="pass" placeholder="type here" oninput="checkPass()" autocomplete="off">
 </div>
 
-<div class="book" id="book-container">
-  <div id="pages" class="pages">
-    <div class="page"><p>Open Me,<br>please!</p></div>
-    <div class="page"></div>
-    <div class="page"><p>Hello there!</p></div>
-    <div class="page"><p>Page 1</p></div>
-    <div class="page"><p>Page 2</p></div>
-    <div class="page"><p>Page 3</p></div>
-    <div class="page"><p>Page 4</p></div>
-    <div class="page"><p>Page 5</p></div>
-    <div class="page"><p>Page 6</p></div>
-    <div class="page"><p>Page 7</p></div>
-    <div class="page"><p>Page 8</p></div>
-    <div class="page"><p>Page 9</p></div>
-    <div class="page"><p>Page 10</p></div>
-    <div class="page"><p>Page 11</p></div>
-    <div class="page"><p>Page 12</p></div>
-    <div class="page"><p>Page 13</p></div>
-    <div class="page"><p>Page 14</p></div>
+<div id="book-wrapper">
+  <div style="position:relative">
+    <div class="spine">
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <div class="ring"></div><div class="ring"></div>
+    </div>
+
+    <div id="book-container">
+      <div class="book">
+        <div class="page cover active" id="p0">
+          <p class="pg-title">A Message For You</p>
+          <p class="pg-text" style="margin-top:8px">made with love</p>
+          <div class="nav">
+            <button class="btn" onclick="goToPage(1)">Open Journal →</button>
+          </div>
+        </div>
+
+        <div class="page lined" id="p1">
+          <p class="pg-text">Every moment with you is special.</p>
+          <div class="nav"><button class="btn" onclick="goToPage(0)">←</button><button class="btn" onclick="goToPage(2)">→</button></div>
+          <p class="pg-num">1/9</p>
+        </div>
+        <div class="page lined" id="p2">
+          <p class="pg-text">I wanted to create something small...</p>
+          <div class="nav"><button class="btn" onclick="goToPage(1)">←</button><button class="btn" onclick="goToPage(3)">→</button></div>
+          <p class="pg-num">2/9</p>
+        </div>
+        <div class="page lined" id="p3">
+          <p class="pg-text">...to show how much you mean to me.</p>
+          <div class="nav"><button class="btn" onclick="goToPage(2)">←</button><button class="btn" onclick="goToPage(4)">→</button></div>
+          <p class="pg-num">3/9</p>
+        </div>
+        <div class="page lined" id="p4">
+          <p class="pg-text">Thank you for being you.</p>
+          <div class="nav"><button class="btn" onclick="goToPage(3)">←</button><button class="btn" onclick="goToPage(5)">→</button></div>
+          <p class="pg-num">4/9</p>
+        </div>
+        <div class="page lined" id="p5">
+          <p class="pg-text">You are my favorite person.</p>
+          <div class="nav"><button class="btn" onclick="goToPage(4)">←</button><button class="btn" onclick="goToPage(6)">→</button></div>
+          <p class="pg-num">5/9</p>
+        </div>
+        <div class="page lined" id="p6">
+          <p class="pg-text">Keep shining bright!</p>
+          <div class="nav"><button class="btn" onclick="goToPage(5)">←</button><button class="btn" onclick="goToPage(7)">→</button></div>
+          <p class="pg-num">6/9</p>
+        </div>
+        <div class="page lined" id="p7">
+          <p class="pg-text">I'm always here for you.</p>
+          <div class="nav"><button class="btn" onclick="goToPage(6)">←</button><button class="btn" onclick="goToPage(8)">→</button></div>
+          <p class="pg-num">7/9</p>
+        </div>
+        <div class="page lined" id="p8">
+          <p class="pg-text">Always and forever.</p>
+          <div class="nav"><button class="btn" onclick="goToPage(7)">←</button><button class="btn" onclick="goToPage(9)">→</button></div>
+          <p class="pg-num">8/9</p>
+        </div>
+        <div class="page lined" id="p9">
+          <p class="pg-text">The End.<br>❤️</p>
+          <div class="nav"><button class="btn" onclick="goToPage(8)">←</button></div>
+          <p class="pg-num">9/9</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-  // Password Logic
+  let cur = 0, busy = false;
+  const IDS = ['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9'];
+
   function checkPass() {
     if (document.getElementById('pass').value.toLowerCase() === 'seramma') {
       const lock = document.getElementById('lock-screen');
       lock.style.opacity = '0';
       setTimeout(() => {
         lock.style.display = 'none';
-        document.getElementById('book-container').style.display = 'block';
-      }, 600);
+        document.getElementById('book-wrapper').style.display = 'block';
+      }, 650);
     }
   }
 
-  // Book Logic from frontendfocus.js
-  const pages = document.querySelectorAll('.page');
-  for (let i = 0; i < pages.length; i++) {
-    if (i % 2 === 0) pages[i].style.zIndex = pages.length - i;
+  function goToPage(t) {
+    if (busy || t === cur) return;
+    busy = true;
+    const d = t > cur ? 'fwd' : 'bwd';
+    const cel = document.getElementById(IDS[cur]), tel = document.getElementById(IDS[t]);
+    cel.classList.add('fo-' + d);
+    setTimeout(() => {
+      cel.classList.remove('active', 'fo-' + d);
+      tel.classList.add('active', 'fi-' + d);
+      setTimeout(() => { tel.classList.remove('fi-' + d); cur = t; busy = false; }, 400);
+    }, 400);
   }
-
-  pages.forEach((page, index) => {
-    page.pageNum = index + 1;
-    page.addEventListener('click', function() {
-      if (this.pageNum % 2 === 0) {
-        this.classList.remove('flipped');
-        this.previousElementSibling.classList.remove('flipped');
-      } else {
-        this.classList.add('flipped');
-        this.nextElementSibling.classList.add('flipped');
-      }
-    });
-  });
 </script>
 </body>
 </html>
